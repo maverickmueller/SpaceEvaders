@@ -17,6 +17,8 @@ public class PlayerControl : MonoBehaviour
 	public float tauntProbability = 50f;	// Chance of a taunt happening.
 	public float tauntDelay = 1f;			// Delay for when the taunt should happen.
 
+	private float prevGravity;
+
 
 	//private int tauntIndex;					// The index of the taunts array indicating the most recent taunt.
 	private Transform groundCheck;			// A position marking where to check if the player is grounded.
@@ -35,40 +37,45 @@ public class PlayerControl : MonoBehaviour
 		groundCheck = transform.Find("groundCheck");
 		ladderCheckRight = transform.Find("ladderCheckRight");
 		ladderCheckLeft = transform.Find("ladderCheckLeft");
+		prevGravity = GetComponent<Rigidbody2D>().gravityScale;
 		//anim = GetComponent<Animator>();
 	}
-
-	private void SetOnLadder(Transform newLadder)
-	{
-		ladder = newLadder;
-	}
-
 
 	void Update()
 	{
 		// The player is grounded if a linecast to the groundcheck position hits anything on the ground layer.
 		grounded = Physics2D.Linecast(transform.position, groundCheck.position, 1 << LayerMask.NameToLayer("Ground"));
 
-		RaycastHit2D hitLadder = Physics2D.Linecast(transform.position, ladderCheckLeft.position, 1 << LayerMask.NameToLayer("Ladder"));
-		if(hitLadder)
+		if(!climbing)
 		{
-			SetOnLadder(hitLadder.transform);
-			byLadder = true;
-		}
-		else 
-		{
-			hitLadder = Physics2D.Linecast(transform.position, ladderCheckRight.position, 1 << LayerMask.NameToLayer("Ladder"));
+			RaycastHit2D hitLadder = Physics2D.Linecast(transform.position, ladderCheckLeft.position, 1 << LayerMask.NameToLayer("Ladder"));
 			if(hitLadder)
 			{
-				SetOnLadder(hitLadder.transform);
+				ladder = hitLadder.transform;
 				byLadder = true;
+			}
+			else 
+			{
+				hitLadder = Physics2D.Linecast(transform.position, ladderCheckRight.position, 1 << LayerMask.NameToLayer("Ladder"));
+				if(hitLadder)
+				{
+					ladder = hitLadder.transform;
+					byLadder = true;
+				}
+				else
+				{
+					byLadder = false;
+				}
 			}
 		}
 
-		if (byLadder && Input.GetButtonDown("Vertical"))
+		if (!climbing && byLadder && Input.GetButtonDown("Vertical"))
 		{
 			climbing = true;
 			Debug.Log("Climbing!");
+			GetComponent<Rigidbody2D>().gravityScale = 0;
+			GetComponent<Rigidbody2D>().velocity = new Vector2(0,0);
+			GetComponent<Rigidbody2D>().position = new Vector2(ladder.position.x, GetComponent<Rigidbody2D>().position.y);
 		}
 
 		// If the jump button is pressed and the player is grounded then the player should jump.
@@ -77,6 +84,7 @@ public class PlayerControl : MonoBehaviour
 			Debug.Log("Jump!");
 			jump = true;
 			climbing = false;
+			GetComponent<Rigidbody2D>().gravityScale = prevGravity;
 		}
 	}
 
@@ -114,7 +122,16 @@ public class PlayerControl : MonoBehaviour
 		else
 		{
 			//climbing mechanics
-			GetComponent<Rigidbody2D>().position = new Vector2(ladder.position.x, GetComponent<Rigidbody2D>().position.y);
+
+			if(v * GetComponent<Rigidbody2D>().velocity.y < maxSpeed)
+				// ... add a force to the player.
+				GetComponent<Rigidbody2D>().AddForce(Vector2.up * v * moveForce);
+
+			// If the player's vertical velocity is greater than the maxSpeed...
+			if(Mathf.Abs(GetComponent<Rigidbody2D>().velocity.y) > maxSpeed)
+				// ... set the player's velocity to the maxSpeed in the x axis.
+				GetComponent<Rigidbody2D>().velocity = new Vector2(GetComponent<Rigidbody2D>().velocity.x, Mathf.Sign(GetComponent<Rigidbody2D>().velocity.y) * maxSpeed);
+			
 		}
 
 		// If the player should jump...
