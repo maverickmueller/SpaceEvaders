@@ -123,15 +123,21 @@ public class PlayerControl : MonoBehaviour
 		{
 			//climbing mechanics
 
-			if(v * GetComponent<Rigidbody2D>().velocity.y < maxSpeed)
-				// ... add a force to the player.
-				GetComponent<Rigidbody2D>().AddForce(Vector2.up * v * moveForce);
+			if(GetComponent<Rigidbody2D>().position.y > ladder.up.y && v > 0)// + ladder.position.y)
+				GetComponent<Rigidbody2D>().velocity = new Vector2(0,0);
+			else
+			{
 
-			// If the player's vertical velocity is greater than the maxSpeed...
-			if(Mathf.Abs(GetComponent<Rigidbody2D>().velocity.y) > maxSpeed)
-				// ... set the player's velocity to the maxSpeed in the x axis.
-				GetComponent<Rigidbody2D>().velocity = new Vector2(GetComponent<Rigidbody2D>().velocity.x, Mathf.Sign(GetComponent<Rigidbody2D>().velocity.y) * maxSpeed);
-			
+				if(v * GetComponent<Rigidbody2D>().velocity.y < maxSpeed)
+					// ... add a force to the player.
+					GetComponent<Rigidbody2D>().position = new Vector2(GetComponent<Rigidbody2D>().position.x, GetComponent<Rigidbody2D>().position.y + v/7);//AddForce(Vector2.up * v * moveForce);
+
+				// If the player's vertical velocity is greater than the maxSpeed...
+				if(Mathf.Abs(GetComponent<Rigidbody2D>().velocity.y) > maxSpeed)
+					// ... set the player's velocity to the maxSpeed in the x axis.
+					GetComponent<Rigidbody2D>().velocity = new Vector2(GetComponent<Rigidbody2D>().velocity.x, Mathf.Sign(GetComponent<Rigidbody2D>().velocity.y) * maxSpeed);
+			}
+			//if player's y is >= ladder's top y, then velocity = 0
 		}
 
 		// If the player should jump...
