@@ -72,7 +72,6 @@ public class PlayerControl : MonoBehaviour
 		if (!climbing && byLadder && Input.GetButtonDown("Vertical"))
 		{
 			climbing = true;
-			Debug.Log("Climbing!");
 			GetComponent<Rigidbody2D>().gravityScale = 0;
 			GetComponent<Rigidbody2D>().velocity = new Vector2(0,0);
 			GetComponent<Rigidbody2D>().position = new Vector2(ladder.position.x, GetComponent<Rigidbody2D>().position.y);
@@ -81,7 +80,6 @@ public class PlayerControl : MonoBehaviour
 		// If the jump button is pressed and the player is grounded then the player should jump.
 		if(Input.GetButtonDown("Jump") && (grounded || climbing))
 		{
-			Debug.Log("Jump!");
 			jump = true;
 			climbing = false;
 			GetComponent<Rigidbody2D>().gravityScale = prevGravity;
