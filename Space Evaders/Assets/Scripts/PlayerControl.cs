@@ -22,6 +22,7 @@ public class PlayerControl : MonoBehaviour
 	private Transform groundCheck;			// A position marking where to check if the player is grounded.
 	private Transform ladderCheckRight;
 	private Transform ladderCheckLeft;
+	private Transform ladder;
 	private bool grounded = false;			// Whether or not the player is grounded.
 	private bool byLadder = false;			// Whether or not the player is standing by a ladder
 	private bool climbing = false;			// Whether or not the player is actively climbing
@@ -37,12 +38,32 @@ public class PlayerControl : MonoBehaviour
 		//anim = GetComponent<Animator>();
 	}
 
+	private void SetOnLadder(Transform newLadder)
+	{
+		ladder = newLadder;
+	}
+
 
 	void Update()
 	{
 		// The player is grounded if a linecast to the groundcheck position hits anything on the ground layer.
 		grounded = Physics2D.Linecast(transform.position, groundCheck.position, 1 << LayerMask.NameToLayer("Ground"));
-		byLadder = Physics2D.Linecast(transform.position, ladderCheckLeft.position, 1 << LayerMask.NameToLayer("Ladder")) || Physics2D.Linecast(transform.position, ladderCheckRight.position, 1 << LayerMask.NameToLayer("Ladder"));
+
+		RaycastHit2D hitLadder = Physics2D.Linecast(transform.position, ladderCheckLeft.position, 1 << LayerMask.NameToLayer("Ladder"));
+		if(hitLadder)
+		{
+			SetOnLadder(hitLadder.transform);
+			byLadder = true;
+		}
+		else 
+		{
+			hitLadder = Physics2D.Linecast(transform.position, ladderCheckRight.position, 1 << LayerMask.NameToLayer("Ladder"));
+			if(hitLadder)
+			{
+				SetOnLadder(hitLadder.transform);
+				byLadder = true;
+			}
+		}
 
 		if (byLadder && Input.GetButtonDown("Vertical"))
 		{
@@ -93,6 +114,7 @@ public class PlayerControl : MonoBehaviour
 		else
 		{
 			//climbing mechanics
+			GetComponent<Rigidbody2D>().position = new Vector2(ladder.position.x, GetComponent<Rigidbody2D>().position.y);
 		}
 
 		// If the player should jump...
