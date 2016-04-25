@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.SceneManagement;
 //HI Caleb
 public class PlayerControl : MonoBehaviour
 {
@@ -116,6 +117,9 @@ public class PlayerControl : MonoBehaviour
 			else if(h < 0 && facingRight)
 				// ... flip the player.
 				Flip();
+
+			if(GetComponent<Rigidbody2D>().position.y < -100)
+				Death();
 		}
 		else
 		{
@@ -166,6 +170,12 @@ public class PlayerControl : MonoBehaviour
 		Vector3 theScale = transform.localScale;
 		theScale.x *= -1;
 		transform.localScale = theScale;
+	}
+
+	public void Death()
+	{
+		Debug.Log("ded :(");
+		SceneManager.LoadScene(SceneManager.GetActiveScene().name);
 	}
 
 /*
