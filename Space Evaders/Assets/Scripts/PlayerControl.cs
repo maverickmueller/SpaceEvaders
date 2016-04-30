@@ -26,6 +26,7 @@ public class PlayerControl : MonoBehaviour
 	private Transform ladderCheckRight;
 	private Transform ladderCheckLeft;
 	private Transform ladder;
+	private Terminal terminal;
 	private bool grounded = false;			// Whether or not the player is grounded.
 	private bool byLadder = false;			// Whether or not the player is standing by a ladder
 	private bool climbing = false;			// Whether or not the player is actively climbing
@@ -46,6 +47,14 @@ public class PlayerControl : MonoBehaviour
 	{
 		// The player is grounded if a linecast to the groundcheck position hits anything on the ground layer.
 		grounded = Physics2D.Linecast(transform.position, groundCheck.position, 1 << LayerMask.NameToLayer("Ground"));
+
+		if(terminal)
+		{
+			if(Input.GetButtonDown("Fire2"))
+			{
+				terminal.Use();
+			}
+		}
 
 		if(!climbing)
 		{
@@ -170,6 +179,18 @@ public class PlayerControl : MonoBehaviour
 		Vector3 theScale = transform.localScale;
 		theScale.x *= -1;
 		transform.localScale = theScale;
+	}
+
+	public void NearTerminal(Terminal newTerminal)
+	{
+		terminal = newTerminal;
+		Debug.Log("Near terminal");
+	}
+
+	public void LeftTerminal()
+	{
+		terminal = null;
+		Debug.Log("Left terminal");
 	}
 
 	public void Death()

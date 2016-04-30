@@ -11,10 +11,16 @@ public class Hazard_Fire : MonoBehaviour {
 		playerScript = (PlayerControl) player.GetComponent(typeof(PlayerControl));
 	}
 
-	void OnTriggerEnter2D(Collider2D other) {
+	void OnTriggerEnter2D(Collider2D other)
+	{
 		if(other.gameObject.name == "player")
 		{
 	        playerScript.Death();
 	    }
+    }
+
+    public void Destroy()
+    {
+    	Destroy(gameObject);
     }
 }
