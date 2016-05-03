@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Hazard_Fire : MonoBehaviour {
+public class HazardFire : MonoBehaviour {
 
 	private PlayerControl playerScript;
 
